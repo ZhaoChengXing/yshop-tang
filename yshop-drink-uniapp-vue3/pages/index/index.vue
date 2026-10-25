@@ -30,18 +30,16 @@
 			</view>
 			<view class="index-content">
 				<view class="flex justify-between index-menu">
+					<view class="flex flex-column align-center index-menu__item index-menu__item--days">
+						<view>我们已经在一起</view>
+						<view class="index-menu__days-num">{{ togetherDays }} 天 💗</view>
+					</view>
 					<view class="flex flex-column align-center index-menu__item" @tap="takein">
 						<view><image src="/static/images/new003.jpg" mode="aspectFit" class="index-menu__icon"></image></view>
-						<view>自取</view>
-						<view class="font-small text-light-black">下单免排队</view>
-					</view>
-					<view class="flex flex-column align-center index-menu__item" @tap="takeout">
-						<view><image src="/static/images/new002.jpg" mode="aspectFit" class="index-menu__icon"></image></view>
-						<view>外卖</view>
-						<view class="font-small text-light-black">美食送到家</view>
+						<view>宝贝点餐</view>
 					</view>
 				</view>
-				 <view class="index-card">
+			 <view class="index-card">
 					<view class="index-card__main">
 						<view class="index-card__header">
 							<text class="index-card__title">我的卡券</text>
@@ -89,6 +87,15 @@ const main = useMainStore()
 const { member,store, isLogin} = storeToRefs(main)
 //const store = ref(main.store)
 const listAds = ref([])
+
+// 用 Date(年, 月从0开始, 日) 构造：小程序/iOS 解析 '2018-10-11 00:00:00' 这类字符串不可靠
+const TOGETHER_START = new Date(2018, 9, 11)
+const togetherDays = (() => {
+	const now = new Date()
+	const start = new Date(TOGETHER_START.getFullYear(), TOGETHER_START.getMonth(), TOGETHER_START.getDate())
+	const today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+	return Math.round((today - start) / 86400000)
+})()
 // const isLogin = ref(main.isLogin)
 
 const handGetListAds = async () => {
@@ -217,10 +224,20 @@ page {
 			background-color: $text-color-white;
 		}
 
+		&__item--days {
+			justify-content: space-evenly;
+			padding-bottom: 0;
+		}
+
 		&__icon {
 			width: 100rpx;
 			height: 100rpx;
 			margin-top: $spacing-row-lg;
+		}
+
+		&__days-num {
+			font-size: $font-size-lg;
+			font-weight: bold;
 		}
 	}
 

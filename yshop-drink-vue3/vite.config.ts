@@ -43,8 +43,10 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
     css: {
       preprocessorOptions: {
         scss: {
-          additionalData: '@import "./src/styles/variables.scss";',
-          javascriptEnabled: true
+          additionalData: '@use "./src/styles/variables.scss" as *;',
+          javascriptEnabled: true,
+          // vite 5.1 仍通过 sass.render(legacy JS API) 编译，升级 vite 到 5.4+ 改用 modern API 后可移除此项
+          silenceDeprecations: ['legacy-js-api'],
         }
       }
     },
@@ -73,6 +75,13 @@ export default ({ command, mode }: ConfigEnv): UserConfig => {
         }
       }
     },
-    optimizeDeps: { include, exclude }
+    optimizeDeps: {
+      include: [
+        ...include,
+        'element-plus/es/components/input-tag/style/css',
+        'element-plus/es/components/mention/style/css'
+      ],
+      exclude
+    }
   }
 }

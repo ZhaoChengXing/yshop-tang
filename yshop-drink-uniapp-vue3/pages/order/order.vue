@@ -72,7 +72,7 @@ import {
 } from 'vue'
 import { useMainStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
-import { onLoad,onPullDownRefresh,onReachBottom} from '@dcloudio/uni-app'
+import { onLoad,onShow,onPullDownRefresh,onReachBottom} from '@dcloudio/uni-app'
 import { formatDateTime,kmUnit } from '@/utils/util'
 import {
   orderGetOrders,
@@ -117,6 +117,15 @@ onLoad(() => {
 		uni.navigateTo({url: '/pages-user/login/login'})
 	}
 	getOrders(false)
+})
+// tabBar 页的 onLoad 只会触发一次，支付完成后 switchTab 回来只能靠 onShow 重新拉取
+let firstShow = true
+onShow(() => {
+	if (firstShow) {
+		firstShow = false
+		return
+	}
+	getOrders(true)
 })
 onPullDownRefresh(() => {
 	 getOrders(false)

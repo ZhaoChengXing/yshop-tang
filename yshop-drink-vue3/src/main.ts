@@ -1,6 +1,8 @@
 // 引入unocss css
 import '@/plugins/unocss'
 
+import 'uno.css'
+
 // 导入全局的svg图标
 import '@/plugins/svgIcon'
 

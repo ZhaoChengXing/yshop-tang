@@ -1,5 +1,6 @@
+// @use 必须写在其他规则之前，故置于 css @import 之上
+@use './FormCreate/index.scss';
 @import './var.css';
-@import './FormCreate/index.scss';
 @import 'element-plus/theme-chalk/dark/css-vars.css';
 
 .reset-margin [class*='el-icon'] + span {
