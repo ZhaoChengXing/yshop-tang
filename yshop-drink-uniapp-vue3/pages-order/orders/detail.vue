@@ -103,6 +103,8 @@
 								<view class="d-flex flex-column w-60 overflow-hidden">
 									<view class="font-size-lg text-color-base mb-10 text-truncate">{{ good.title }}</view>
 									<view class="font-size-sm text-color-assist text-truncate">{{ good.spec }}</view>
+									<view v-if="isShopManager && good.productId" class="order-detail-page__recipe"
+										@click.stop="showRecipe(good)">制作方法</view>
 								</view>
 								<view class="d-flex w-40 align-items-center justify-content-between pl-30">
 									<view class="font-size-base text-color-base">x{{ good.number }}</view>
@@ -195,12 +197,16 @@ import {
   ref
 } from 'vue'
 import { onLoad} from '@dcloudio/uni-app'
+import { useMainStore } from '@/store/store'
+import { storeToRefs } from 'pinia'
 import { formatDateTime } from '@/utils/util'
 import {
   orderDetail,
   orderReceive,
   managerOrderInfo
 } from '@/api/order'
+const main = useMainStore()
+const { isShopManager } = storeToRefs(main)
 const title = ref('订单详情')
 const order = ref({
 	shop:{name:''},
@@ -237,6 +243,13 @@ const makePhoneCall = () =>{
 		fail(res) {
 			console.log(res)
 		}
+	})
+}
+
+// 店长：查看这道菜的做法与抖音教学视频
+const showRecipe = (good) => {
+	uni.navigateTo({
+		url: '/pages-manager/goods/recipe?id=' + good.productId
 	})
 }
 
@@ -306,6 +319,16 @@ page {
 		height: var(--order-detail-thumb-size);
 		margin-right: $spacing-row-lg;
 		border-radius: $order-detail-thumb-radius;
+	}
+
+	&__recipe {
+		align-self: flex-start;
+		margin-top: 8rpx;
+		padding: 2rpx 16rpx;
+		font-size: $font-size-sm;
+		color: $color-primary;
+		border: 1rpx solid $color-primary;
+		border-radius: 20rpx;
 	}
 
 	&__sort-num {

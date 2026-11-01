@@ -47,4 +47,13 @@ public class ManagerProductSaveReqVO {
     @Schema(description = "商品描述")
     private String description;
 
+    @Schema(description = "菜谱/制作步骤")
+    private String recipe;
+
+    @Schema(description = "教学视频链接（抖音分享链接）", example = "https://v.douyin.com/xxxx/")
+    private String videoUrl;
+
+    @Schema(description = "教学视频标题")
+    private String videoTitle;
+
 }

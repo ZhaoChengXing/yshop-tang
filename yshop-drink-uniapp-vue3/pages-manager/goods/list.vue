@@ -29,6 +29,7 @@
 							</view>
 						</view>
 						<view class="goods-item__actions">
+							<view class="goods-item__btn" @tap="showRecipe(good)">做法</view>
 							<view class="goods-item__btn" @tap="editGoods(good)">编辑</view>
 							<view class="goods-item__btn" @tap="toggleSale(good)">{{ good.isShow == 1 ? '下架' : '上架' }}</view>
 							<view class="goods-item__btn goods-item__btn--danger" @tap="removeGoods(good)">删除</view>
@@ -104,6 +105,12 @@ const editGoods = async (good) => {
 	const shopId = await resolveShopId()
 	uni.navigateTo({
 		url: '/pages-manager/goods/edit?id=' + good.id + '&shopId=' + (shopId || 0)
+	})
+}
+
+const showRecipe = (good) => {
+	uni.navigateTo({
+		url: '/pages-manager/goods/recipe?id=' + good.id
 	})
 }
 

@@ -35,6 +35,13 @@
 									<view class="font-size-sm mt-1">{{ good.spec }}</view>
 									<view class="font-size-sm mt-2">×{{ good.number }}  ¥{{ good.price }}</view>
 								</view>
+								<button
+									v-if="isShopManager && good.productId"
+									class="order-item__recipe"
+									plain
+									size="mini"
+									@tap.stop="showRecipe(good)"
+								>制作方法</button>
 							</view>
 						</view>
 						<view class="d-flex justify-content-between align-items-center order-item__meta">
@@ -240,6 +247,13 @@ const isSelfOrder = (item) => {
 	return !member.value || !member.value.id || item.uid == member.value.id
 }
 
+// 店长：查看这道菜的做法与抖音教学视频
+const showRecipe = (good) => {
+	uni.navigateTo({
+		url: '/pages-manager/goods/recipe?id=' + good.productId
+	})
+}
+
 // 已支付、未退款、还没完成/收货的订单才显示出单
 const canSend = (item) => {
 	return item.paid > 0 && item.refundStatus == 0 && item.status < 2
@@ -283,6 +297,18 @@ $order-thumb-radius: 8rpx;
 		height: var(--order-thumb-size);
 		margin-right: $spacing-row-lg;
 		border-radius: $order-thumb-radius;
+	}
+
+	&__recipe {
+		flex-shrink: 0;
+		align-self: center;
+		margin-left: auto;
+		padding: 0 16rpx;
+		font-size: 22rpx;
+		line-height: 44rpx;
+		color: $color-primary;
+		border-color: $color-primary;
+		border-radius: 22rpx;
 	}
 
 	&__meta {

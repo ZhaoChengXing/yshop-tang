@@ -21,6 +21,13 @@ export function managerGoodsList(data) {
 }
 
 /**
+ * 店长菜品做法详情（菜谱 + 教学视频链接）
+ */
+export function managerGoodsDetail(id) {
+  return api.get('/product/manager/detail?id=' + id, {}, { login: true })
+}
+
+/**
  * 新增/编辑商品
  */
 export function managerGoodsSave(data) {

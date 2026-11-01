@@ -188,6 +188,12 @@
           }
         },
         {
+          "path": "goods/recipe",
+          "style": {
+            "navigationBarTitleText": "制作方法"
+          }
+        },
+        {
           "path": "orders/pay-detail",
           "style": {
             "navigationBarTitleText": "支付详情"

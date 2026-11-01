@@ -112,6 +112,15 @@ public class StoreProductDto
     @NotBlank(message = "商品详情不能为空")
     private String description;
 
+    /** 菜谱/制作步骤 */
+    private String recipe;
+
+    /** 教学视频链接（抖音分享链接） */
+    private String videoUrl;
+
+    /** 教学视频标题 */
+    private String videoTitle;
+
 
     /** 是否包邮 */
     @JsonProperty("is_postage")

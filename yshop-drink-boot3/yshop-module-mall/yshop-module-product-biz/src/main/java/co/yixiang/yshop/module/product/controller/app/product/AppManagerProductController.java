@@ -1,5 +1,6 @@
 package co.yixiang.yshop.module.product.controller.app.product;
 
+import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.collection.ListUtil;
 import cn.hutool.core.util.StrUtil;
 import co.yixiang.yshop.framework.common.exception.ErrorCode;
@@ -7,6 +8,7 @@ import co.yixiang.yshop.framework.common.pojo.CommonResult;
 import co.yixiang.yshop.framework.security.core.annotations.PreAuthenticated;
 import co.yixiang.yshop.module.member.api.user.MemberUserApi;
 import co.yixiang.yshop.module.product.controller.app.category.vo.AppCategoryRespVO;
+import co.yixiang.yshop.module.product.controller.app.product.vo.ManagerProductRecipeRespVO;
 import co.yixiang.yshop.module.product.controller.app.product.vo.ManagerProductSaleReqVO;
 import co.yixiang.yshop.module.product.controller.app.product.vo.ManagerProductSaveReqVO;
 import co.yixiang.yshop.module.product.dal.dataobject.storeproduct.StoreProductDO;
@@ -69,6 +71,21 @@ public class AppManagerProductController {
     }
 
     @PreAuthenticated
+    @GetMapping("/detail")
+    @Operation(summary = "店长菜品做法详情")
+    @Parameter(name = "id", description = "菜品id", required = true, example = "1")
+    public CommonResult<ManagerProductRecipeRespVO> detail(@RequestParam("id") Long id) {
+        validateManager();
+        StoreProductDO product = storeProductService.getStoreProduct(id);
+        if (product == null) {
+            throw exception(STORE_PRODUCT_NOT_EXISTS);
+        }
+        ManagerProductRecipeRespVO respVO = new ManagerProductRecipeRespVO();
+        BeanUtil.copyProperties(product, respVO);
+        return success(respVO);
+    }
+
+    @PreAuthenticated
     @PostMapping("/save")
     @Operation(summary = "新增或编辑商品")
     @Transactional(rollbackFor = Exception.class)
@@ -99,6 +116,9 @@ public class AppManagerProductController {
             dto.setImage(image);
             dto.setSliderImage(ListUtil.toList(image));
             dto.setDescription(description);
+            dto.setRecipe(reqVO.getRecipe());
+            dto.setVideoUrl(reqVO.getVideoUrl());
+            dto.setVideoTitle(reqVO.getVideoTitle());
             dto.setIsShow(isShow);
             dto.setSpecType(SpecTypeEnum.TYPE_0.getValue());
             dto.setUnitName("份");
@@ -123,6 +143,9 @@ public class AppManagerProductController {
         updateObj.setImage(image);
         updateObj.setSliderImage(image);
         updateObj.setDescription(description);
+        updateObj.setRecipe(reqVO.getRecipe());
+        updateObj.setVideoUrl(reqVO.getVideoUrl());
+        updateObj.setVideoTitle(reqVO.getVideoTitle());
         updateObj.setPrice(reqVO.getPrice());
         updateObj.setStock(reqVO.getStock());
         updateObj.setIsShow(isShow);

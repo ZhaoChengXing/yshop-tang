@@ -44,6 +44,27 @@
 			</view>
 		</list-cell>
 		<list-cell :hover="false">
+			<view class="goods-form__field goods-form__field--top">
+				<view class="goods-form__label">菜谱</view>
+				<textarea class="goods-form__textarea" placeholder="每行一个步骤，例如：1. 番茄切块" v-model="form.recipe"
+					placeholder-class="text-color-assist" maxlength="-1"></textarea>
+			</view>
+		</list-cell>
+		<list-cell :hover="false">
+			<view class="goods-form__field">
+				<view class="goods-form__label">抖音链接</view>
+				<input class="goods-form__input" placeholder="粘贴抖音分享链接" v-model="form.videoUrl"
+					placeholder-class="text-color-assist" />
+			</view>
+		</list-cell>
+		<list-cell :hover="false">
+			<view class="goods-form__field">
+				<view class="goods-form__label">视频标题</view>
+				<input class="goods-form__input" placeholder="选填" v-model="form.videoTitle"
+					placeholder-class="text-color-assist" />
+			</view>
+		</list-cell>
+		<list-cell :hover="false">
 			<view class="goods-form__field">
 				<view class="goods-form__label">图片</view>
 				<view class="goods-form__image-box" @tap="chooseImage">
@@ -72,7 +93,7 @@ import {
 import { useMainStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
 import { onLoad } from '@dcloudio/uni-app'
-import { managerGoodsList, managerGoodsSave } from '@/api/goods'
+import { managerGoodsList, managerGoodsSave, managerGoodsDetail } from '@/api/goods'
 import { VUE_APP_UPLOAD_URL } from '@/config'
 import cookie from '@/utils/cookie'
 
@@ -93,7 +114,10 @@ const form = ref({
 	image: '',
 	price: '',
 	stock: '',
-	isShow: 1
+	isShow: 1,
+	recipe: '',
+	videoUrl: '',
+	videoTitle: ''
 })
 
 const toast = (message) => uni.showToast({
@@ -109,7 +133,7 @@ onLoad(async (option) => {
 	}
 	await loadCates()
 	if (form.value.id) {
-		fillGoods(form.value.id)
+		await fillGoods(form.value.id)
 	} else if (cates.value.length > 0) {
 		form.value.cateId = String(cates.value[0].id)
 	}
@@ -120,7 +144,7 @@ const loadCates = async () => {
 	cates.value = data || []
 }
 
-const fillGoods = (id) => {
+const fillGoods = async (id) => {
 	for (const cate of cates.value) {
 		const good = (cate.goodsList || []).find(item => item.id == id)
 		if (!good) continue
@@ -133,9 +157,22 @@ const fillGoods = (id) => {
 			image: good.image,
 			price: good.price,
 			stock: good.stock,
-			isShow: good.isShow
+			isShow: good.isShow,
+			recipe: '',
+			videoUrl: '',
+			videoTitle: ''
 		}
 		cateIndex.value = Math.max(0, cates.value.findIndex(item => item.id == good.cateId))
+		try {
+			const detail = await managerGoodsDetail(id)
+			if (detail) {
+				form.value.recipe = detail.recipe || ''
+				form.value.videoUrl = detail.videoUrl || ''
+				form.value.videoTitle = detail.videoTitle || ''
+			}
+		} catch (e) {
+			// 详情接口不可用时保留列表里的基础信息
+		}
 		return
 	}
 	toast('菜品不存在')
@@ -213,7 +250,10 @@ const save = async () => {
 		image: form.value.image,
 		price: Number(form.value.price),
 		stock: stock,
-		isShow: form.value.isShow
+		isShow: form.value.isShow,
+		recipe: form.value.recipe,
+		videoUrl: form.value.videoUrl,
+		videoTitle: form.value.videoTitle
 	})
 	if (data) {
 		toast('已保存')
@@ -247,6 +287,19 @@ $goods-form-btn-width: 85%;
 		display: flex;
 		align-items: center;
 		width: 100%;
+
+		&--top {
+			align-items: flex-start;
+			padding: 10rpx 0;
+		}
+	}
+
+	&__textarea {
+		flex: 1;
+		width: 100%;
+		height: 240rpx;
+		font-size: $font-size-base;
+		line-height: 1.6;
 	}
 
 	&__label {
