@@ -7,6 +7,11 @@
 		  @leftClick="$onClickLeft"
 		/>
 		
+		<!-- 店长入口 -->
+		<view class="manager-entry" v-if="isShopManager" @tap="goManagerGoods">
+			菜品管理
+		</view>
+
 		<view class="container" v-if="!loading">
 			<!-- <view>
 				<image :src="shopAd" mode="aspectFill" class="w-100 " style="height: 250rpx;"></image>
@@ -248,10 +253,11 @@ import {
   menuGoods
 } from '@/api/goods'
 import {
-  menuAds
+  menuAds,
+  shopGetList
 } from '@/api/market'
 const main = useMainStore()
-const { orderType,address, store,location,isLogin } = storeToRefs(main)
+const { orderType,address, store,location,isLogin,isShopManager } = storeToRefs(main)
 const title = ref('点餐')
 const text = ref('滚动通知')
 
@@ -310,7 +316,6 @@ const spread = computed(() => { //差多少元起送
 
 // 监听自定义事件（需与 $off 使用同一引用）
 const refreshMenuHandler = () => {
-	console.log('refreshMenu1:',store.value.id)
 	init()
 }
 uni.$on('refreshMenu', refreshMenuHandler)
@@ -327,13 +332,19 @@ onHide(() => {
 	sizeCalcState.value = false;
 })
 onShow(() => {
-	//init();
 	refreshCart()
 	shopAd.value = uni.getStorageSync('shopAd')
 })
 onUnload(() => {
 	uni.$off('refreshMenu', refreshMenuHandler)
 })
+
+// 店长：进入菜品管理
+const goManagerGoods = () => {
+	uni.navigateTo({
+		url: '/pages-manager/goods/list'
+	})
+}
 
 const openCartShow = () =>{
 	isCartShow.value = false
@@ -1443,4 +1454,25 @@ page {
 	padding: 15rpx !important;
 	background-color: $menu-sold-out-bg;
 }
+
+
+// 店长入口
+.manager-entry {
+	position: fixed;
+	right: $spacing-row-lg;
+	/* #ifdef H5 */
+	bottom: calc(var(--window-bottom) + #{$menu-cart-height} + #{$spacing-row-lg});
+	/* #endif */
+	/* #ifndef H5 */
+	bottom: calc(#{$menu-cart-height} + #{$spacing-row-lg} * 2);
+	/* #endif */
+	z-index: 9000;
+	padding: 16rpx $spacing-row-lg;
+	font-size: $font-size-sm;
+	color: $text-color-white;
+	background-color: $color-primary;
+	border-radius: $menu-radius-pill;
+	box-shadow: $menu-shadow-cart;
+}
+
 </style>

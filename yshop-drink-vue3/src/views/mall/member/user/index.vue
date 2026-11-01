@@ -71,6 +71,16 @@
         :formatter="dateFormatter"
       />
       <el-table-column label="用户余额" align="center" prop="nowMoney" />
+      <el-table-column label="是否店长" align="center" prop="role" width="120">
+        <template #default="scope">
+          <el-switch
+            v-model="scope.row.role"
+            active-value="shopManager"
+            inactive-value="customer"
+            @change="handleRoleChange(scope.row)"
+          />
+        </template>
+      </el-table-column>
       <el-table-column label="用户登陆类型" align="center" prop="loginType">
         <template #default="scope">
           <span v-if="scope.row.loginType == 'routine'">小程序</span>
@@ -173,6 +183,17 @@ const handleClick = (tab: TabsPaneContext, event: Event) => {
   queryParams.pageNo = 1
   queryParams.loginType = tab.paneName
   getList()
+}
+
+/** 切换店长身份 */
+const handleRoleChange = async (row: any) => {
+  const role = row.role
+  try {
+    await UserApi.updateUser({ id: row.id, role })
+    message.success(role === 'shopManager' ? '已设为店长' : '已取消店长')
+  } catch {
+    row.role = role === 'shopManager' ? 'customer' : 'shopManager'
+  }
 }
 
 /** 添加/修改操作 */

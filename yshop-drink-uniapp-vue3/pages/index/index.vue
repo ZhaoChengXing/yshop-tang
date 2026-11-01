@@ -53,6 +53,19 @@
 						去领个券
 					</view>
 				</view>
+				<view class="index-card" v-if="isShopManager">
+					<view class="index-card__main" @tap="goManagerOrders">
+						<view class="index-card__header">
+							<text class="index-card__title">店长工作台</text>
+						</view>
+						<view class="index-card__desc">
+							查看全部门店订单，管理菜品
+						</view>
+					</view>
+					<view class="index-card__action" @tap="goManagerGoods">
+						菜品管理
+					</view>
+				</view>
 				<view class="index-card">
 					<view class="index-card__main" @tap="goScore">
 						<view class="index-card__header">
@@ -84,7 +97,7 @@ import { storeToRefs } from 'pinia'
 import { useMainStore } from '@/store/store'
 //
 const main = useMainStore()
-const { member,store, isLogin} = storeToRefs(main)
+const { member,store, isLogin, isShopManager} = storeToRefs(main)
 //const store = ref(main.store)
 const listAds = ref([])
 
@@ -148,6 +161,18 @@ const coupons = () => {
 const goScore = () => { 
 	uni.navigateTo({
 		url: '/pages-score/scoreproduct/list'
+	})
+}
+
+const goManagerOrders = () => {
+	uni.switchTab({
+		url: '/pages/order/order'
+	})
+}
+
+const goManagerGoods = () => {
+	uni.navigateTo({
+		url: '/pages-manager/goods/list'
 	})
 }
 

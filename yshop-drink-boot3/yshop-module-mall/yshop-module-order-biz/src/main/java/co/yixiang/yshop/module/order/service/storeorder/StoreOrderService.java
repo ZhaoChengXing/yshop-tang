@@ -51,6 +51,13 @@ public interface StoreOrderService {
     void takeStoreOrder(Long id);
 
     /**
+     * 出单（与订单中心工作台的“出单”一致）
+     *
+     * @param id 编号
+     */
+    void orderSend(Long id);
+
+    /**
      * 获得订单
      *
      * @param id 编号

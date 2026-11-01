@@ -15,7 +15,7 @@
 					<view class="w-100 d-flex align-items-center">
 						<view class="flex-fill d-flex flex-column">
 							<view class="font-size-lg text-color-base order-item__shop">
-								{{ item.shop.name }}
+								{{ item.shop && item.shop.name ? item.shop.name : '门店' }}
 							</view>
 							<view class="font-size-sm text-color-assist">取餐号：{{ item.numberId }}</view>
 							<view class="font-size-sm text-color-assist">订单编号：{{ item.orderId }}</view>
@@ -48,13 +48,24 @@
 						</view>
 						<view class="d-flex align-items-center justify-content-end order-item__actions">
 							<button
-								v-if="item.paid > 0 && item.status < 2 && item.refundStatus == 0"
+								v-if="isSelfOrder(item) && item.paid > 0 && item.status < 2 && item.refundStatus == 0"
 								class="order-item__btn"
 								plain
 								size="mini"
 								@tap.stop="receive(item)"
 							>确认收到餐</button>
 							<button class="order-item__btn" plain size="mini" @tap="detail(item.orderId)">订单详情</button>
+							<template v-if="isShopManager">
+								<button class="order-item__btn" plain size="mini" @tap.stop="payDetail(item.id)">支付详情</button>
+								<button
+									v-if="canSend(item)"
+									class="order-item__btn"
+									plain
+									size="mini"
+									@tap.stop="send(item)"
+								>出单</button>
+								<button class="order-item__btn" plain size="mini" @tap.stop="remove(item)">删除</button>
+							</template>
 						</view>
 					</view>
 				</list-cell>
@@ -68,24 +79,28 @@
 <script setup>
 import {
   ref,
-  computed
+  computed,
+  watch
 } from 'vue'
 import { useMainStore } from '@/store/store'
 import { storeToRefs } from 'pinia'
 import { onLoad,onShow,onPullDownRefresh,onReachBottom} from '@dcloudio/uni-app'
-import { formatDateTime,kmUnit } from '@/utils/util'
+import { formatDateTime } from '@/utils/util'
 import {
   orderGetOrders,
-  orderReceive
+  orderReceive,
+  managerOrderList,
+  managerOrderSend,
+  managerOrderDelete
 } from '@/api/order'
 const main = useMainStore()
-const { isLogin } = storeToRefs(main)
-const title = ref('我的订单')
+const { isLogin, isShopManager, member } = storeToRefs(main)
+const title = computed(() => isShopManager.value ? '订单管理' : '我的订单')
 
 const page = ref(1)
 const pageSize = ref(10)
 const orders = ref([])
-const tabList = ref([{
+const tabList = [{
 			type: -1,
 			name: '全部',
 		}, {
@@ -101,7 +116,6 @@ const tabList = ref([{
 			type: -3,
 			name: '退款单'
 		}]
-)
 const current = ref(0)
 const type = ref(-1)
 
@@ -118,9 +132,19 @@ onLoad(() => {
 	}
 	getOrders(false)
 })
+// 角色刷新后，店长改为查全部店铺订单
+watch(isShopManager, () => {
+	current.value = 0
+	type.value = -1
+	getOrders(true)
+})
 // tabBar 页的 onLoad 只会触发一次，支付完成后 switchTab 回来只能靠 onShow 重新拉取
 let firstShow = true
 onShow(() => {
+	// 老会话里可能还没有角色字段，进页面时补一次
+	if (isLogin.value) {
+		main.refreshMember()
+	}
 	if (firstShow) {
 		firstShow = false
 		return
@@ -136,8 +160,6 @@ onReachBottom(() => {
 
 // tab栏切换
 const change = (e) => {
-	//console.log('e;',e.type)
-	//console.log('e.index;',e.index)
 	type.value = e.type
 	getOrders(true)
 }
@@ -150,7 +172,16 @@ const getOrders = async(isRefresh = false) => {
 		orders.value = []
 		page.value = 1
 	}
-	let ordersData = await orderGetOrders({page:page.value, limit:pageSize.value,type:type.value});
+	let ordersData = null
+	if (isShopManager.value) {
+		ordersData = await managerOrderList({
+			type: type.value,
+			page: page.value,
+			limit: pageSize.value
+		})
+	} else {
+		ordersData = await orderGetOrders({page:page.value, limit:pageSize.value,type:type.value});
+	}
 
 	if(ordersData) {
 		orders.value = orders.value.concat(ordersData)
@@ -160,8 +191,18 @@ const getOrders = async(isRefresh = false) => {
 	uni.hideLoading()
 }
 const detail = (id) => {
+	// 店长看的是所有店铺的订单，详情要走店长接口
+	const url = isShopManager.value
+		? '/pages-order/orders/detail?id=' + id + '&manage=1'
+		: '/pages-order/orders/detail?id=' + id
 	uni.navigateTo({
-		url: '/pages-order/orders/detail?id=' + id
+		url: url
+	})
+}
+// 店长：查看订单中心工作台“详情”里的信息
+const payDetail = (id) => {
+	uni.navigateTo({
+		url: '/pages-manager/orders/pay-detail?id=' + id
 	})
 }
 // 确认收到货
@@ -171,8 +212,38 @@ const receive  = async(order) => {
 		await getOrders(true)
 	}
 }
-	
+// 店长：出单（与后台工作台一致）
+const send = async(order) => {
+	let data = await managerOrderSend({id: order.id})
+	if (data) {
+		uni.showToast({ title: '已出单', icon: 'none' })
+		await getOrders(true)
+	}
+}
+// 店长：删除订单
+const remove = async(order) => {
+	uni.showModal({
+		title: '提示',
+		content: `确定删除订单 ${order.orderId} 吗？`,
+		success: async (res) => {
+			if (!res.confirm) return
+			let data = await managerOrderDelete({id: order.id})
+			if (data) {
+				uni.showToast({ title: '已删除', icon: 'none' })
+				await getOrders(true)
+			}
+		}
+	})
+}
 
+const isSelfOrder = (item) => {
+	return !member.value || !member.value.id || item.uid == member.value.id
+}
+
+// 已支付、未退款、还没完成/收货的订单才显示出单
+const canSend = (item) => {
+	return item.paid > 0 && item.refundStatus == 0 && item.status < 2
+}
 </script>
 
 <style lang="scss" scoped>

@@ -202,6 +202,20 @@ public class StoreOrderServiceImpl implements StoreOrderService {
         appStoreOrderService.takeOrder(storeOrderDO.getOrderId(),storeOrderDO.getUid());
     }
 
+    @Override
+    public void orderSend(Long id) {
+        StoreOrderDO storeOrderDO = storeOrderMapper.selectById(id);
+        if (storeOrderDO == null) {
+            throw exception(STORE_ORDER_NOT_EXISTS);
+        }
+        // 复用后台工作台的出单逻辑：自取直接完成，外送置为待取货，堂食不改状态
+        StoreOrderUpdateReqVO updateReqVO = new StoreOrderUpdateReqVO();
+        updateReqVO.setId(id);
+        updateReqVO.setOrderType(storeOrderDO.getOrderType());
+        updateReqVO.setUpdateType(UpdateOrderEnum.ORDER_SEND.getValue());
+        updateStoreOrder(updateReqVO);
+    }
+
 
     private void validateStoreOrderExists(Long id) {
         if (storeOrderMapper.selectById(id) == null) {
@@ -212,6 +226,9 @@ public class StoreOrderServiceImpl implements StoreOrderService {
     @Override
     public StoreOrderRespVO getStoreOrder(Long id) {
         StoreOrderDO storeOrderDO = storeOrderMapper.selectById(id);
+        if (storeOrderDO == null) {
+            throw exception(STORE_ORDER_NOT_EXISTS);
+        }
         StoreOrderRespVO storeOrderRespVO = StoreOrderConvert.INSTANCE.convert(storeOrderDO);
         MemberUserDO memberUserDO = memberUserMapper.selectById(storeOrderRespVO.getUid());
         UserRespVO  userRespVO = UserConvert.INSTANCE.convert4(memberUserDO);

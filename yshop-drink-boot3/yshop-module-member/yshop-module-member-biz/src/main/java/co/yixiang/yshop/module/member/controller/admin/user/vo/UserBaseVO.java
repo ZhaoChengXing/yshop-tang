@@ -2,6 +2,7 @@ package co.yixiang.yshop.module.member.controller.admin.user.vo;
 
 import co.yixiang.yshop.module.member.api.user.dto.WechatUserDto;
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.constraints.Pattern;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -75,6 +76,10 @@ public class UserBaseVO {
 
     @Schema(description = "生日")
     private String birthday;
+
+    @Schema(description = "角色：customer 普通用户 / shopManager 店长", example = "customer")
+    @Pattern(regexp = "customer|shopManager", message = "角色只能是 customer 或 shopManager")
+    private String role;
 
     /**
      * 最后一次登录ip

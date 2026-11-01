@@ -24,6 +24,7 @@ export interface UserVO {
   spreadUid: number
   spreadTime: Date
   userType: string
+  role: string
   isPromoter: byte
   payCount: number
   spreadCount: number
@@ -49,7 +50,7 @@ export const createUser = async (data: UserVO) => {
 }
 
 // 修改用户
-export const updateUser = async (data: UserVO) => {
+export const updateUser = async (data: Partial<UserVO>) => {
   return await request.put({ url: `/member/user/update`, data })
 }
 

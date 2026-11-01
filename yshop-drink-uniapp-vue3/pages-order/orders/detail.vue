@@ -199,6 +199,7 @@ import { formatDateTime } from '@/utils/util'
 import {
   orderDetail,
   orderReceive,
+  managerOrderInfo
 } from '@/api/order'
 const title = ref('订单详情')
 const order = ref({
@@ -208,11 +209,12 @@ const order = ref({
 const numForMading = ref(5)
 
 onLoad((option) => {
-	detail(option.id);
+	// manage=1 表示店长查看任意用户的订单
+	detail(option.id, option.manage == 1);
 })
 
-const detail =  async(id) => {
-	let data = await orderDetail(id);
+const detail =  async(id, manage = false) => {
+	let data = manage ? await managerOrderInfo(id) : await orderDetail(id);
 	if (data) {
 		order.value = data;
 	}

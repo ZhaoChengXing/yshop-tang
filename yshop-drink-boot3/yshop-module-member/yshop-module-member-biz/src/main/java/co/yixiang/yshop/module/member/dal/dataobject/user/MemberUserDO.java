@@ -146,6 +146,10 @@ public class MemberUserDO extends TenantBaseDO {
      */
     private String userType;
     /**
+     * 角色：customer 普通用户 / shopManager 店长
+     */
+    private String role;
+    /**
      * 是否为推广员
      */
     private Integer isPromoter;

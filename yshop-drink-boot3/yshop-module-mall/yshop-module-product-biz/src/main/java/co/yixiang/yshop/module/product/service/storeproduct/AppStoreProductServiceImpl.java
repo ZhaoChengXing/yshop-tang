@@ -32,6 +32,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 
 import jakarta.annotation.Resource;
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -146,6 +147,43 @@ public class AppStoreProductServiceImpl extends ServiceImpl<StoreProductMapper,S
 
     }
 
+    /**
+     * 店长商品列表，包含未上架商品和停用分类
+     *
+     * @param shopId 店铺id，为空或 0 查全部（店长商品管理用）
+     * @return 分类及商品
+     */
+    @Override
+    public List<AppCategoryRespVO> getManagerGoodsList(Integer shopId) {
+        LambdaQueryWrapper<ProductCategoryDO> categoryWrapper = new LambdaQueryWrapper<>();
+        if (shopId != null && shopId > 0) {
+            categoryWrapper.eq(ProductCategoryDO::getShopId, shopId);
+        }
+        categoryWrapper.orderByAsc(ProductCategoryDO::getSort);
+        List<ProductCategoryDO> categoryList = categoryService.list(categoryWrapper);
+        List<AppCategoryRespVO> appCategoryRespVOS = ProductCategoryConvert.INSTANCE.convertList03(categoryList);
+
+        for (AppCategoryRespVO appCategoryRespVO : appCategoryRespVOS) {
+            LambdaQueryWrapper<StoreProductDO> wrapper = new LambdaQueryWrapper<>();
+            wrapper.eq(StoreProductDO::getCateId, String.valueOf(appCategoryRespVO.getId()));
+            if (shopId != null && shopId > 0) {
+                wrapper.eq(StoreProductDO::getShopId, shopId);
+            }
+            wrapper.orderByAsc(StoreProductDO::getId);
+
+            List<AppStoreProductRespVo> goodsList = new ArrayList<>();
+            for (StoreProductDO storeProductDO : this.baseMapper.selectList(wrapper)) {
+                Map<String, Object> returnMap = appStoreProductAttrService.getProductAttrDetail(storeProductDO.getId());
+                AppStoreProductRespVo storeProductQueryVo = StoreProductConvert.INSTANCE.convert01(storeProductDO);
+                storeProductQueryVo.setProductAttr((List<AppStoreProductAttrQueryVo>) returnMap.get("productAttr"));
+                storeProductQueryVo.setProductValue((Map<String, StoreProductAttrValueDO>) returnMap.get("productValue"));
+                goodsList.add(storeProductQueryVo);
+            }
+            appCategoryRespVO.setGoodsList(goodsList);
+        }
+
+        return appCategoryRespVOS;
+    }
 
 
     /**

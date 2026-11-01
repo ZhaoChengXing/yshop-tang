@@ -15,6 +15,10 @@ onLaunch(() => {
 	console.log('App Launch')
 	// 冷启动从本地恢复会话，避免 Pinia 空态导致登录态丢失
 	main.init()
+	// 已登录时刷新一次会员信息，拿到最新的角色（customer / shopManager）
+	if (main.isLogin) {
+		main.refreshMember()
+	}
 	// #ifdef MP-WEIXIN
 	// 冷启动静默登录一次；已有 token 则跳过
 	if (!main.isLogin) {

@@ -48,4 +48,11 @@ public interface StoreProductAttrService extends IService<StoreProductAttrDO>  {
     void insertYxStoreProductAttr(List<FromatDetailDto> items, List<ProductFormatDto> attrs,
                                   Long productId);
 
+    /**
+     * 删除商品的全部规格
+     *
+     * @param productId 商品id
+     */
+    void deleteYxStoreProductAttrByProductId(Long productId);
+
 }

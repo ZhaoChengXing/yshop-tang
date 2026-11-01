@@ -31,4 +31,9 @@ public class MemberUserRespDTO {
      */
     private String mobile;
 
+    /**
+     * 角色：customer 普通用户 / shopManager 店长
+     */
+    private String role;
+
 }

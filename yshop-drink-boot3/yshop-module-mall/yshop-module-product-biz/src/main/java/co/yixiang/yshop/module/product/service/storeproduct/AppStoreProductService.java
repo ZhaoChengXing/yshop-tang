@@ -32,6 +32,14 @@ public interface AppStoreProductService extends IService<StoreProductDO> {
      */
     List<AppCategoryRespVO> getGoodsList(AppStoreProductQueryParam productQueryParam);
 
+    /**
+     * 店长商品列表，包含未上架商品和停用分类
+     *
+     * @param shopId 店铺id，为空或 0 查全部（店长商品管理用）
+     * @return 分类及商品
+     */
+    List<AppCategoryRespVO> getManagerGoodsList(Integer shopId);
+
 
     /**
      * 返回普通商品库存

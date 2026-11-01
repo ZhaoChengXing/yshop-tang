@@ -85,6 +85,9 @@ public class AppUserQueryVo implements Serializable {
     @Schema(description = "用户类型", required = true)
     private String userType;
 
+    @Schema(description = "角色：customer 普通用户 / shopManager 店长", required = true)
+    private String role;
+
     @Schema(description = "是否为推广员", required = true)
     private Integer isPromoter;
 

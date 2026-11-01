@@ -61,3 +61,38 @@ export function payUnify(data) {
 export function getWechatConfig() {
   return api.get(`/member/wx-mp/create-jsapi-signature`, { url: location.href }, { login: true })
 }
+
+/**
+ * 店长订单列表 type: -1 全部 0 未支付 1 待制作 2 待取货 4 已完成 -3 退款
+ */
+export function managerOrderList(data) {
+  return api.get('/order/manager/list', data, { login: true })
+}
+
+/**
+ * 店长订单详细
+ */
+export function managerOrderDetail(id) {
+  return api.get('/order/manager/detail?id=' + id, {}, { login: true })
+}
+
+/**
+ * 店长查看任意用户的订单详情
+ */
+export function managerOrderInfo(orderId) {
+  return api.get('/order/manager/order-detail?orderId=' + orderId, {}, { login: true })
+}
+
+/**
+ * 出单
+ */
+export function managerOrderSend(data) {
+  return api.post('/order/manager/send', data, { login: true })
+}
+
+/**
+ * 删除订单
+ */
+export function managerOrderDelete(data) {
+  return api.post('/order/manager/delete', data, { login: true })
+}

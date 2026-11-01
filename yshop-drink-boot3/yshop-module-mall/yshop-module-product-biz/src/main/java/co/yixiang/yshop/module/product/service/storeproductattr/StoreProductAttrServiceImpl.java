@@ -5,6 +5,7 @@ import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import co.yixiang.yshop.framework.common.util.string.StrUtils;
 import co.yixiang.yshop.module.product.dal.dataobject.storeproductattr.StoreProductAttrDO;
+import co.yixiang.yshop.module.product.dal.dataobject.storeproductattrresult.StoreProductAttrResultDO;
 import co.yixiang.yshop.module.product.dal.dataobject.storeproductattrvalue.StoreProductAttrValueDO;
 import co.yixiang.yshop.module.product.dal.mysql.storeproductattr.StoreProductAttrMapper;
 import co.yixiang.yshop.module.product.dal.mysql.storeproductattrvalue.StoreProductAttrValueMapper;
@@ -155,6 +156,18 @@ public class StoreProductAttrServiceImpl extends ServiceImpl<StoreProductAttrMap
         map.put("value",attrs);
 
         storeProductAttrResultService.insertYxStoreProductAttrResult(map,productId);
+    }
+
+    /**
+     * 删除商品的全部规格
+     *
+     * @param productId 商品id
+     */
+    @Override
+    public void deleteYxStoreProductAttrByProductId(Long productId) {
+        clearProductAttr(productId);
+        storeProductAttrResultService.remove(Wrappers.<StoreProductAttrResultDO>lambdaQuery()
+                .eq(StoreProductAttrResultDO::getProductId, productId));
     }
 
     /**

@@ -60,4 +60,15 @@ public interface MemberUserApi {
      */
     MemberUserRespDTO getUserByMobile(String mobile);
 
+    /**
+     * 是否为店长
+     *
+     * @param id 用户编号
+     * @return 是否店长
+     */
+    default boolean isShopManager(Long id) {
+        MemberUserRespDTO user = getUser(id);
+        return user != null && "shopManager".equals(user.getRole());
+    }
+
 }

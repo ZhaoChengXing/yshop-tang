@@ -173,6 +173,29 @@
       ]
     },
     {
+      "root": "pages-manager",
+      "pages": [
+        {
+          "path": "goods/list",
+          "style": {
+            "navigationBarTitleText": "菜品管理"
+          }
+        },
+        {
+          "path": "goods/edit",
+          "style": {
+            "navigationBarTitleText": "菜品"
+          }
+        },
+        {
+          "path": "orders/pay-detail",
+          "style": {
+            "navigationBarTitleText": "支付详情"
+          }
+        }
+      ]
+    },
+    {
       "root": "pages-score",
       "pages": [
         {

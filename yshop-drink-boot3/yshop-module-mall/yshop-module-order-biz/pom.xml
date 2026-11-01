@@ -37,6 +37,11 @@
             <artifactId>yshop-module-product-biz</artifactId>
             <version>${revision}</version>
         </dependency>
+        <dependency>
+            <groupId>co.yixiang.boot</groupId>
+            <artifactId>yshop-module-member-api</artifactId>
+            <version>${revision}</version>
+        </dependency>
 
 
         <!-- 业务组件 -->

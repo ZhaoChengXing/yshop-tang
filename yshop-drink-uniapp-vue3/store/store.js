@@ -2,6 +2,7 @@ import { defineStore } from 'pinia'
 
 import cookie from '@/utils/cookie'
 import { navigateTo } from '@/utils/router'
+import { userGetUserInfo } from '@/api/user'
 
 export const useMainStore = defineStore('main', {
   state: () => ({
@@ -24,6 +25,9 @@ export const useMainStore = defineStore('main', {
   getters: {
     isLogin(state) {
       return !!(state.token || cookie.get('accessToken'))
+    },
+    isShopManager(state) {
+      return !!(state.member && state.member.role === 'shopManager')
     },
   },
   actions: {
@@ -89,6 +93,13 @@ export const useMainStore = defineStore('main', {
       }
       if (userinfo && typeof userinfo === 'object') {
         this.member = userinfo
+      }
+    },
+    async refreshMember() {
+      if (!this.isLogin) return
+      const data = await userGetUserInfo()
+      if (data) {
+        this.SET_MEMBER(data)
       }
     },
     logout() {
